@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cloud Promoters - Gestão de Divulgadores</title>
-    <!-- Importando o cliente oficial do Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { font-family: Arial, sans-serif; background: #0f172a; color: #fff; margin: 0; padding: 20px; }
@@ -41,7 +40,7 @@
 
     <script>
         const SUPABASE_URL = 'https://gjuojuimexwtcjjyrskdv.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_962sxbl3XdcKVncXSiP8Va_ImfAK';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdqdW9qdWltZXh3dGNqeXJza2R2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NzMzNTIsImV4cCI6MjEwNTI0OTM1Mn0.6CN4DRxmc_E_-K2TUJwWxm10RnVGeXnQRTTIYrlBhqk';
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -74,7 +73,7 @@
                 document.getElementById('instagram').value = '';
             } catch (error) {
                 mensagem.style.color = '#f87171';
-                mensagem.innerText = 'Erro ao cadastrar: ' + (error.message || error.error_description || JSON.stringify(error));
+                mensagem.innerText = 'Erro ao cadastrar: ' + (error.message || JSON.stringify(error));
             }
         }
     </script>
