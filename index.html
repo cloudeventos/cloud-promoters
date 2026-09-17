@@ -40,9 +40,9 @@
 
     <script>
         const SUPABASE_URL = 'https://gjuojuimexwtcjjyrskdv.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdqdW9qdWltZXh3dGNqeXJza2R2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NzMzNTIsImV4cCI6MjEwNTI0OTM1Mn0.6CN4DRxmc_E_-K2TUJwWxm10RnVGeXnQRTTIYrlBhqk';
+        const SUPABASE_KEY = 'sb_publishable_962sxb13x0dKvNcx5iP8Vw_enFAK';
         
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         async function cadastrarPromoter() {
             const nome = document.getElementById('nome').value;
