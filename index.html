@@ -73,7 +73,7 @@
                 document.getElementById('instagram').value = '';
             } catch (error) {
                 mensagem.style.color = '#f87171';
-                mensagem.innerText = 'Erro ao cadastrar: ' + (error.message || JSON.stringify(error));
+                mensagem.innerText = 'Erro: ' + (error.message || JSON.stringify(error));
             }
         }
     </script>
