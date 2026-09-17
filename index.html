@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cloud Promoters - Gestão de Divulgadores</title>
+    <!-- Importando o cliente oficial do Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { font-family: Arial, sans-serif; background: #0f172a; color: #fff; margin: 0; padding: 20px; }
         .container { max-width: 600px; margin: 0 auto; background: #1e293b; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
@@ -38,6 +40,11 @@
     </div>
 
     <script>
+        const SUPABASE_URL = 'https://gjuojuimexwtcjjyrskdv.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_962sxbl3XdcKVncXSiP8Va_ImfAK';
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         async function cadastrarPromoter() {
             const nome = document.getElementById('nome').value;
             const instagram = document.getElementById('instagram').value;
@@ -52,33 +59,22 @@
             mensagem.style.color = '#38bdf8';
             mensagem.innerText = 'Salvando na nuvem...';
 
-            const SUPABASE_URL = 'https://gjuojuimexwtcjjyrskdv.supabase.co';
-            const SUPABASE_ANON_KEY = 'sb_publishable_962sxbl3XdcKVncXSiP8Va_ImfAK';
-
             try {
-                const resposta = await fetch(`${SUPABASE_URL}/rest/v1/promoters`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'Prefer': 'return=representation'
-                    },
-                    body: JSON.stringify({ nome: nome, instagram: instagram })
-                });
+                const { data, error } = await supabaseClient
+                    .from('promoters')
+                    .insert([{ nome: nome, instagram: instagram }]);
 
-                if (resposta.ok) {
-                    mensagem.style.color = '#4ade80';
-                    mensagem.innerText = 'Cadastro realizado com sucesso na nuvem! 🎉';
-                    document.getElementById('nome').value = '';
-                    document.getElementById('instagram').value = '';
-                } else {
-                    const erroJson = await resposta.json();
-                    throw new Error(erroJson.message || 'Erro ao salvar no banco.');
+                if (error) {
+                    throw error;
                 }
+
+                mensagem.style.color = '#4ade80';
+                mensagem.innerText = 'Cadastro realizado com sucesso na nuvem! 🎉';
+                document.getElementById('nome').value = '';
+                document.getElementById('instagram').value = '';
             } catch (error) {
                 mensagem.style.color = '#f87171';
-                mensagem.innerText = 'Erro ao cadastrar: ' + error.message;
+                mensagem.innerText = 'Erro ao cadastrar: ' + (error.message || error.error_description || JSON.stringify(error));
             }
         }
     </script>
