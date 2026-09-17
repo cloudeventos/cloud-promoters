@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cloud Promoters — V1</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#080b12;color:#eef2ff;font-family:Inter,Arial,sans-serif}
+header{padding:22px 28px;border-bottom:1px solid #1c2333;display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:800;letter-spacing:.5px}.logo span{color:#5ea0ff}
+button{border:0;border-radius:10px;padding:11px 15px;background:#347ff6;color:#fff;font-weight:700;cursor:pointer}
+button.secondary{background:#182133}.wrap{max-width:1180px;margin:auto;padding:25px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.card{background:#0f1420;border:1px solid #202a3c;border-radius:14px;padding:18px}
+.kpi{font-size:27px;font-weight:800;margin-top:8px}.muted{color:#8995aa;font-size:13px}.tabs{display:flex;gap:8px;margin:22px 0}.tabs button.active{background:#347ff6}
+.panel{display:none}.panel.active{display:block}.row{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid #1d2635}
+.badge{font-size:12px;padding:5px 8px;border-radius:999px;background:#17243b;color:#8eb8ff}.ok{background:#123322;color:#70e0a0}.pending{background:#3a2c12;color:#f3c66b}
+input,select{width:100%;padding:11px;border-radius:9px;border:1px solid #2a3549;background:#0a0f18;color:#fff;margin-top:6px}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:14px}.full{grid-column:1/-1}
+.actions{display:flex;gap:8px}.small{padding:7px 10px;font-size:12px}
+.modal{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;padding:20px}.modal.open{display:flex}.modalbox{background:#101722;border:1px solid #2a3549;border-radius:16px;padding:22px;width:min(600px,100%)}
+@media(max-width:800px){.grid{grid-template-columns:1fr 1fr}.form{grid-template-columns:1fr}.full{grid-column:auto}}
+</style>
+</head>
+<body>
+<header><div class="logo">CLOUD <span>PROMOTERS</span></div><button onclick="openModal()">+ Nova campanha</button></header>
+<div class="wrap">
+<div class="grid">
+<div class="card"><div class="muted">Campanhas ativas</div><div class="kpi" id="kCampaigns">0</div></div>
+<div class="card"><div class="muted">Divulgadores</div><div class="kpi" id="kPromoters">0</div></div>
+<div class="card"><div class="muted">Comprovações</div><div class="kpi" id="kProofs">0</div></div>
+<div class="card"><div class="muted">Aprovadas</div><div class="kpi" id="kApproved">0</div></div>
+</div>
+
+<div class="tabs">
+<button class="active" onclick="tab('dashboard',this)">Dashboard</button>
+<button onclick="tab('campaigns',this)">Campanhas</button>
+<button onclick="tab('promoters',this)">Divulgadores</button>
+<button onclick="tab('proofs',this)">Comprovações</button>
+</div>
+
+<section id="dashboard" class="panel active">
+<div class="card"><h2>Resumo</h2><div id="dash"></div></div>
+</section>
+
+<section id="campaigns" class="panel">
+<div class="card"><h2>Campanhas</h2><div id="campaignList"></div></div>
+</section>
+
+<section id="promoters" class="panel">
+<div class="card"><h2>Divulgadores</h2><p class="muted">Cadastro simples da primeira versão.</p>
+<div class="form">
+<label>Nome<input id="pname"></label><label>Instagram<input id="pig" placeholder="@usuario"></label>
+<label>WhatsApp<input id="pwhats"></label><label>Seguidores<input id="pfollow" type="number"></label>
+</div><br><button onclick="addPromoter()">Cadastrar divulgador</button>
+<div id="promoterList" style="margin-top:20px"></div>
+</div>
+</section>
+
+<section id="proofs" class="panel">
+<div class="card"><h2>Comprovações</h2><p class="muted">Nesta V1 o divulgador envia o link/observação. A integração automática com Instagram entra na V2.</p><div id="proofList"></div></div>
+</section>
+</div>
+
+<div class="modal" id="modal"><div class="modalbox">
+<h2>Nova campanha</h2>
+<div class="form">
+<label class="full">Nome do evento<input id="cname" placeholder="Ex.: Tília • 08/08"></label>
+<label>Data<input id="cdate" type="date"></label>
+<label>Horário limite<input id="ctime" type="time"></label>
+<label>Recompensa<select id="creward"><option>Cortesia</option><option>Backstage</option><option>Desconto</option><option>Pontos</option></select></label>
+<label>Regra<input id="crule" value="Postar Story + marcar @cloudeventos_"></label>
+</div><br>
+<div class="actions"><button onclick="saveCampaign()">Criar campanha</button><button class="secondary" onclick="closeModal()">Cancelar</button></div>
+</div></div>
+
+<script>
+const key='cloud_promoters_v1';
+let db=JSON.parse(localStorage.getItem(key)||'null')||{
+ campaigns:[{id:1,name:'Evento de teste Cloud',date:'2026-10-10',time:'00:00',reward:'Cortesia',rule:'Postar Story + marcar @cloudeventos_'}],
+ promoters:[],
+ proofs:[]
+};
+function save(){localStorage.setItem(key,JSON.stringify(db));render()}
+function tab(id,b){document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active')}
+function openModal(){modal.classList.add('open')} function closeModal(){modal.classList.remove('open')}
+function saveCampaign(){
+ if(!cname.value)return alert('Informe o nome do evento.');
+ db.campaigns.push({id:Date.now(),name:cname.value,date:cdate.value,time:ctime.value,reward:creward.value,rule:crule.value});
+ cname.value='';closeModal();save();
+}
+function addPromoter(){
+ if(!pname.value||!pig.value)return alert('Informe nome e Instagram.');
+ db.promoters.push({id:Date.now(),name:pname.value,ig:pig.value,whats:pwhats.value,followers:+pfollow.value||0});
+ pname.value=pig.value=pwhats.value=pfollow.value='';save();
+}
+function addProof(){
+ if(!db.promoters.length||!db.campaigns.length)return alert('Cadastre campanha e divulgador primeiro.');
+ const p=db.promoters[0],c=db.campaigns[0];
+ db.proofs.push({id:Date.now(),promoter:p.name,ig:p.ig,campaign:c.name,proof:'Comprovação enviada manualmente',status:'Pendente',created:new Date().toLocaleString('pt-BR')});save();
+}
+function approve(id){let x=db.proofs.find(p=>p.id===id);if(x)x.status='Aprovada';save()}
+function render(){
+ kCampaigns.textContent=db.campaigns.length;kPromoters.textContent=db.promoters.length;kProofs.textContent=db.proofs.length;kApproved.textContent=db.proofs.filter(x=>x.status==='Aprovada').length;
+ campaignList.innerHTML=db.campaigns.map(c=>`<div class="row"><div><b>${c.name}</b><div class="muted">${c.date||'sem data'} • limite ${c.time||'—'} • ${c.rule}</div></div><span class="badge">${c.reward}</span></div>`).join('');
+ promoterList.innerHTML=db.promoters.length?db.promoters.map(p=>`<div class="row"><div><b>${p.name}</b> <span class="muted">${p.ig}</span><div class="muted">${p.followers.toLocaleString('pt-BR')} seguidores • ${p.whats||'sem WhatsApp'}</div></div><button class="small" onclick="addProof()">Enviar comprovação</button></div>`).join(''):'<p class="muted">Nenhum divulgador cadastrado.</p>';
+ proofList.innerHTML=db.proofs.length?db.proofs.map(p=>`<div class="row"><div><b>${p.promoter}</b> <span class="muted">${p.ig}</span><div class="muted">${p.campaign} • ${p.created}</div></div><div class="actions"><span class="badge ${p.status==='Aprovada'?'ok':'pending'}">${p.status}</span>${p.status!=='Aprovada'?`<button class="small" onclick="approve(${p.id})">Aprovar</button>`:''}</div></div>`).join(''):'<p class="muted">Nenhuma comprovação.</p>';
+ dash.innerHTML=`<div class="row"><span>Campanhas</span><b>${db.campaigns.length}</b></div><div class="row"><span>Divulgadores</span><b>${db.promoters.length}</b></div><div class="row"><span>Comprovações aprovadas</span><b>${db.proofs.filter(x=>x.status==='Aprovada').length}</b></div><div style="margin-top:18px"><button onclick="tab('promoters',document.querySelectorAll('.tabs button')[2])">Cadastrar divulgador</button> <button class="secondary" onclick="addProof()">Criar comprovação de teste</button></div>`;
+}
+render();
+</script>
+</body></html>
